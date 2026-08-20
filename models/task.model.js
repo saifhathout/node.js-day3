@@ -4,38 +4,51 @@ const taskSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true,
+      required: [true, 'Title is required'],
+      unique: true,
       trim: true,
     },
 
     description: {
       type: String,
-      required: true,
+      required: [true, 'Description is required'],
       trim: true,
     },
 
     status: {
       type: String,
-      required: true,
-      default: 'pending',
+      required: [true, 'Status is required'],
+      enum: {
+        values: ['created', 'in progress', 'done'],
+        message: 'Status must be created, in progress, or done',
+      },
+      default: 'created',
     },
 
     priority: {
-      type: String,
-      required: true,
-      default: 'medium',
+      type: Number,
+      required: [true, 'Priority is required'],
+      min: [1, 'Priority cannot be less than 1'],
+      max: [10, 'Priority cannot be greater than 10'],
     },
 
     dueDate: {
       type: Date,
-      required: true,
+      required: [true, 'Due date is required'],
     },
 
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: [true, 'Assigned user is required'],
     },
+
+    collaborators: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     timestamps: true,
