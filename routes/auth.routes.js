@@ -3,18 +3,15 @@ const { body } = require('express-validator');
 const router = express.Router();
 
 const validate = require('../middlewares/validation.middleware');
-const { protect, authorize } = require('../middlewares/auth.middleware');
-
+const { protect } = require('../middlewares/auth.middleware');
 const {
-  getUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser
-} = require('../controllers/user.controller');
+  register,
+  login,
+  getMe
+} = require('../controllers/auth.controller');
 
 router.post(
-  '/',
+  '/register',
   [
     body('name').trim().notEmpty().withMessage('Name is required'),
     body('email').trim().isEmail().withMessage('Valid email is required'),
@@ -26,13 +23,21 @@ router.post(
       .isIn(['admin', 'manager', 'user'])
       .withMessage('Invalid role')
   ],
-  validate,
-  createUser
+  validate,        
+  register       
 );
 
-router.get('/', protect, authorize('admin'), getUsers);
-router.get('/:id', protect, authorize('admin'), getUserById);
-router.put('/:id', protect, authorize('admin'), updateUser);
-router.delete('/:id', protect, authorize('admin'), deleteUser);
+
+router.post(
+  '/login',
+  [
+    body('email').trim().isEmail().withMessage('Valid email is required'),
+    body('password').notEmpty().withMessage('Password is required')
+  ],
+  validate,
+  login
+);
+
+router.get('/me', protect, getMe);
 
 module.exports = router;
